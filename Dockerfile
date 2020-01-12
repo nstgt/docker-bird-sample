@@ -1,5 +1,6 @@
+ARG IMAGE="debian:buster-20191224"
 
-FROM debian:buster-20191224 as birdwatcher_builder
+FROM ${IMAGE} as birdwatcher_builder
 ARG GO_VERSION="1.13"
 WORKDIR /root
 RUN apt update \
@@ -15,7 +16,7 @@ RUN go get -u github.com/golang/dep/cmd/dep \
     && go mod download \
     && make
 
-FROM debian:buster-20191224 as bird_builder
+FROM ${IMAGE} as bird_builder
 ARG BIRD_VERSION="2.0.7"
 WORKDIR /root
 COPY --from=birdwatcher_builder /root/birdwatcher/birdwatcher-linux-amd64 /usr/bin/birdwatcher
@@ -31,7 +32,7 @@ RUN git clone https://gitlab.labs.nic.cz/labs/bird.git \
     && make \
     && make install
 
-FROM debian:buster-20191224
+FROM ${IMAGE}
 WORKDIR /root
 RUN apt update \
     && apt install -y supervisor libncurses-dev libreadline-gplv2-dev libssh-dev
